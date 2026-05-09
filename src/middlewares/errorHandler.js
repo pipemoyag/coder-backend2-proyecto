@@ -1,8 +1,8 @@
 export const globalErrorHandler = (err, req, res, next) => {
-  console.error(`[ERROR CRITICO] en ${req.method} ${req.originalUrl}`);
+  console.error(`[ERROR] ${req.method} ${req.originalUrl}`);
   console.error(err);
 
-  const statusCode = err.starus || 500;
+  const statusCode = err.status || 500;
 
   const response = {
     error: true,

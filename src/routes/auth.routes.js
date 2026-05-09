@@ -9,26 +9,18 @@ import { env } from "../config/env.js";
 
 const router = Router();
 
-// ##### CLASE 4: PASSPORT GITHUB #####
-
-// a authenticate le pasamos la estrategia que definimos en el passport.config
-// user:email es porque passport por defecto considera un "user", y le indicamos que use el email
 router.get(
   "/github",
   passport.authenticate("github", { scope: ["user:email"] }),
 );
 
-// el failureRedirect es para que, si falla, devuelva al login
 router.get(
   "/github/callback",
   passport.authenticate("github", { failureRedirect: "/login" }),
   (req, res) => {
-    res.redirect("/api/users/profile"); // si el login es exitoso, redirige a profile, que es una ruta protegida
-    // AQUI QUEDE (20:35, me deben haber quedado como 25 min)
+    res.redirect("/api/users/profile");
   },
 );
-
-// ##### LOGIN #####
 router.post("/login", validateLogin, async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -40,16 +32,12 @@ router.post("/login", validateLogin, async (req, res) => {
     if (!user || !isValidPassword) {
       return res.status(401).json({ message: "Email o password invalidos" });
     }
-    // CLASE 3: TOKENS
     const { accessToken, refreshToken } = generateTokens(user);
 
-    // OJO: express sesion permite tener un objeto session en cada request, donde se guarda la informacion
     req.session.user = {
       id: user._id,
       email: user.email,
     };
-
-    // CLASE 7, FLAG DE ACCESO MOBILE, DONDE SE USAN TOKENS, NO COOKIES
     const isMobile = req.body.client === "mobile";
     if (isMobile) {
       return res.status(200).json({
@@ -62,16 +50,15 @@ router.post("/login", validateLogin, async (req, res) => {
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: env.mode === "production", // false solo para desarrollo
-      sameSite: "lax", // para evitar problemas con CORS. Alternativa 'strict' o 'none' (esta última requiere secure: true)
-      maxAge: 15 * 60 * 1000, // 15 minutos, el tiempo que configuramos en jwt.js
+      secure: env.mode === "production",
+      sameSite: "lax",
+      maxAge: 15 * 60 * 1000,
     });
 
-    // generamos una cookie para guardar el token de refresco, el cual vivirá por 7 días (el tiempo que configuramos en jwt.js)
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: env.mode === "production", // false solo para desarrollo
-      sameSite: "lax", // para evitar problemas con CORS. Alternativa 'strict' o 'none' (esta última requiere secure: true)
+      secure: env.mode === "production",
+      sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -83,18 +70,16 @@ router.post("/login", validateLogin, async (req, res) => {
   }
 });
 
-// CLASE 7: REFRESH TOKEN
 router.post("/refresh", async (req, res) => {
-  // IMPORTANTE, refreshToken en modo mobile llegará en el body, y en modo web llegará en las cookies, por eso hacemos esta validación para obtenerlo de ambos lugares
-  const token = req.cookies?.refreshToken || req.body?.refreshToken; // dependiendo de si es mobile o no, el token de refresco vendrá en cookies o en el body
+  const token = req.cookies?.refreshToken || req.body?.refreshToken;
 
   if (!token) {
     return res.status(401).json({ message: "No hay refreshToken" });
   }
 
   try {
-    const decoded = verifyRefreshToken(token); // esta función la creamos en jwt.js, y lo que hace es verificar el token de refresco, y si es válido, devuelve el payload (que es el user)
-    const user = await userModel.findById(decoded.id || decoded._id); // con el id del user que obtuvimos del token de refresco, buscamos al usuario en la base de datos
+    const decoded = verifyRefreshToken(token);
+    const user = await userModel.findById(decoded.id || decoded._id);
 
     if (!user) {
       return res.status(401).json({ message: "El usuario no existe" });
@@ -104,17 +89,15 @@ router.post("/refresh", async (req, res) => {
 
     const isMobile = req.body.client === "mobile";
 
-    // MODO MOBILE
     if (isMobile) {
       return res.status(200).json({ accessToken });
     }
 
-    // MODO WEB
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: env.mode === "production", // false solo para desarrollo
-      sameSite: "lax", // para evitar problemas con CORS. Alternativa 'strict' o 'none' (esta última requiere secure: true)
-      maxAge: 15 * 60 * 1000, // 15 minutos, el tiempo que configuramos en jwt.js
+      secure: env.mode === "production",
+      sameSite: "lax",
+      maxAge: 15 * 60 * 1000,
     });
 
     res.status(200).json({ message: "Token de acceso renovado" });
@@ -132,14 +115,6 @@ router.post("/logout", async (req, res) => {
     res.clearCookie("accessToken");
     res.status(200).json({ message: "Sesion cerrada" });
   });
-});
-
-router.post("/refresh", async (req, res) => {
-  const a = 1;
-  // PARA CLASE 4, AQUI VERIFICAMOS EL TOKEN DE REFRESCO, Y SI LO VALIDA (SI NO HA VENCIDO), GENERARÁ UN NUEVO
-  // TOKEN PARA EL USUARIO, PARA QUE SE LO PUEDA PASAR A PROFILE Y QUE LO RECONOZCA
-  // ASÍ, EL TOKEN DE ACCESO DURA POCO EN EL SERVIDOR, PERO SI DESDE EL FRONT SE CONFIGURA PARA
-  // MANTENER ACTIVO AL USUARIO MEDIANTE EL TOKEN DE REFRESH, GENERANDO NUEVOS TOKEN DE ACCESO
 });
 
 export default router;

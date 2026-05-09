@@ -1,7 +1,5 @@
 import dotenv from "dotenv";
 
-// clase 6
-// NODE_ENV NO lo agregaremos al .env
 const environment = process.env.NODE_ENV || "development";
 
 dotenv.config({
@@ -9,7 +7,6 @@ dotenv.config({
 });
 
 export const env = {
-  // clase 6
   mode: environment,
 
   port: process.env.PORT || 4000,
