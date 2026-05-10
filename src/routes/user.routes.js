@@ -21,6 +21,15 @@ const requireAll = [passportAuthGuard, authorizeRoles(["user", "premium"])];
 
 router.get("/", requireAdmin, getAll);
 router.get("/profile", requireAll, getProfile);
+
+router.get("/session", passportAuthGuard, (req, res) => {
+  res.status(200).json({
+    message: "Sesión actual",
+    session: req.session,
+    user: req.user,
+  });
+});
+
 router.post("/", registerGuard, createProfile);
 
 // USUARIO PREMIUM
