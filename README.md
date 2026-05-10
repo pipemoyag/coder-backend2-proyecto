@@ -1,94 +1,88 @@
-# Plantilla de servidor básico con Express
+# Proyecto de Autenticación Híbrida con Node.js
 
-Este proyecto es una plantilla básica para configurar un servidor con **Express** y **Nodemon**, ideal para iniciar rápidamente nuevos desarrollos en Node.js.
+Este repositorio contiene un proyecto backend que implementa un sistema de autenticación híbrido con **Node.js**, **Express**, **MongoDB**, **Passport.js**, **JWT** y **OAuth GitHub**.
 
-## Características
+## Resumen del proyecto
 
-- **Express** para gestionar rutas y middleware.
-- **Nodemon** para recargar automáticamente el servidor durante el desarrollo.
-- Configuración minimalista lista para usar.
-
----
+- Registro y login local con email y contraseña.
+- Autenticación JWT con accessToken y refreshToken.
+- Login social con GitHub OAuth.
+- Sesiones persistentes en MongoDB usando `express-session` y `connect-mongo`.
+- Autorización basada en roles: `admin`, `user`, `premium`.
+- Rutas protegidas por autenticación y autorización.
+- Manejo centralizado de errores y validación de datos.
 
 ## Instalación
 
-### 1. Clonar el repositorio con `degit`
-
-`degit` es una herramienta para clonar plantillas de manera limpia (sin el historial de Git).
-
-#### Instalar `degit` (si no lo tienes instalado)
+1. Clona el repositorio:
 
 ```bash
-npm install -g degit
+git clone https://github.com/pipemoyag/coder-backend2-proyecto.git
+cd codigo
 ```
 
-#### Clonar el repositorio
-
-```bash
-degit DanielRiverol/template-express-basic carpeta-destino
-```
-
-Reemplaza `usuario/repo-nombre` por el nombre del repositorio y `carpeta-destino` por el nombre de la carpeta donde deseas clonar el proyecto.
-
-### 2. Instalar dependencias
-
-Una vez clonado el repositorio, entra en la carpeta del proyecto:
-
-```bash
-cd carpeta-destino
-```
-
-Luego, instala las dependencias:
+2. Instala las dependencias:
 
 ```bash
 npm install
 ```
 
----
+3. Crea el archivo `.env` en la raíz con los valores requeridos.
 
-## Comandos disponibles
+Ejemplo mínimo:
 
-### Iniciar el servidor
+```env
+NODE_ENV=development
+PORT=4000
+DB_URI=mongodb://localhost:27017/auth_db
+SECRET=mi_secret_de_sesiones
+JWT_SECRET=mi_jwt_secret
+JWT_REFRESH_TOKEN=mi_refresh_secret
+GITHUB_CLIENT_ID=tu_github_client_id
+GITHUB_CLIENT_SECRET=tu_github_client_secret
+GITHUB_CALLBACK_URL=http://localhost:4000/api/auth/github/callback
+```
 
-Este comando inicia el servidor en modo desarrollo con Nodemon:
+## Ejecución
+
+Inicia el servidor en modo desarrollo con nodemon:
 
 ```bash
 npm run dev
 ```
 
-### Actualizar dependencias (Opcional)
+El servidor arranca en `http://localhost:4000`.
 
-Para poder todas estas dependencias a su última versión, deberás instalar un paquete llamado `npm-check-updates` de forma global:
+## Scripts
 
-```bash
-npm install -g npm-check-updates
-```
+- `npm run dev`: Inicia el servidor en modo desarrollo con recarga automática.
+- `npm start`: Inicia el servidor en modo producción.
 
-Una vez instalado deberás correr el siguiente comando:
-
-```bash
-ncu -u
-```
-
-Esto modificará tu archivo package.json para que todas las dependencias estén listadas en sus últimas versiones.
-
-Una vez completado este proceso, basta con ejecutar el siguiente comando para actualizar todas tus dependencias:
-
-```bash
-npm install
-```
-
-## Estructura del proyecto
+## Estructura principal
 
 ```plaintext
-carpeta-destino/
-├── package.json    # Dependencias y configuración del proyecto
-├── index.js       # Archivo principal del servidor
-├── README.md       # Documentación del proyecto
+src/
+├── config/               # Configuración de entorno y conexión a MongoDB
+├── controllers/          # Lógica de negocio para usuarios
+├── middlewares/          # Autenticación, autorización y manejo de errores
+├── models/               # Esquemas de Mongoose
+├── routes/               # Endpoints de autenticación y usuarios
+├── utils/                # Helpers de JWT y bcrypt
+└── index.js              # Punto de entrada del servidor
 ```
+
+## Detalles técnicos y evidencias
+
+El documento técnico completo con la implementación detallada, ejemplos de endpoints, seguridad, y capturas de Postman está disponible en `DOCUMENTO_FINAL.md`.
+
+## Notas adicionales
+
+- Asegúrate de tener MongoDB corriendo antes de iniciar el servidor.
+- Para probar GitHub OAuth debes configurar una app en GitHub y añadir las credenciales en `.env`.
+- El proyecto usa `cookie-parser`, `express-session`, `passport`, `passport-jwt` y `passport-github2`.
 
 ---
 
 ## Licencia
 
-Este proyecto está licenciado bajo la licencia **MIT**. Consulta el archivo [LICENSE](./LICENSE) para más detalles.
+Consulta el archivo `LICENSE` para los detalles de la licencia MIT.
