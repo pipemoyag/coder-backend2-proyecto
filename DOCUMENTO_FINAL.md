@@ -1011,6 +1011,7 @@ Se eligió Opción 1 porque la seguridad es crítica en autenticación.
    - Formularios HTML no pueden enviar headers custom
 
 4. **Validación en backend**
+
    ```javascript
    router.post("/logout", (req, res) => {
      req.session.destroy(); // Invalida sesión
@@ -1134,8 +1135,7 @@ Nivel 7: Logging de seguridad (Auditoría)
 
 ### ⚠️ INSTRUCCIONES PARA CAPTURAS
 
-Este documento requiere que captures en **Postman** las siguientes operaciones.  
-Cada captura debe mostrar claramente:
+Se mostrarán las siguientes capturas de Postman
 
 - **URL** completa
 - **Método HTTP**
@@ -1597,7 +1597,7 @@ console.log(jwt.decode(token));
 
 ---
 
-**Fecha de entrega:** 28/05/2026 – 20:00 hs  
+**Fecha de entrega:** 09/05/2026
 **Formato:** Google Docs  
 **Versión:** 1.0  
-**Autor:** [Tu nombre]
+**Autor:** Felipe Moya Gallo
